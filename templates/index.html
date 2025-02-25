@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earthquake Watch</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header id="header">
+        <div class="row">
+            <div class="col-2">
+                <div id="logo">
+                    <h1>🌎 Earthquake Watch</h1>
+                    <h2>Your Safety, Our Priority</h2>
+                </div>
+            </div>
+            <nav class="col-10">
+                <ul id="nav-main">
+                    <li><a href="#monitoring">Monitoring</a></li>
+                    <li><a href="/all-earthquakes">All Earthquakes</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero row big-padding-top big-padding-bottom">
+        <div class="col-12 text-center">
+            <p>Real-time Earthquake Monitoring & Prevention Insights</p>
+            <a href="#monitoring" class="button primary-btn">View Earthquake Data</a>
+        </div>
+    </section>
+
+    <!-- Earthquake Monitoring Section -->
+    <section id="monitoring" class="section row big-padding-bottom">
+        <div class="col-12 text-center">
+            <h2>Recent Earthquakes in Nepal</h2>
+            <div class="earthquake-container clearfix">
+                {% for quake in earthquakes[:4] %}
+                <div class="earthquake-card col-4">
+                    <img src="{{ quake.image_url }}" alt="Epicenter: {{ quake.epicenter }}" class="image-center">
+                    <h3>{{ quake.epicenter }}</h3>
+                    <p><strong>Date (B.S.):</strong> {{ quake.date_bs }}</p>
+                    <p><strong>Date (A.D.):</strong> {{ quake.date_ad }}</p>
+                    <p><strong>Magnitude:</strong> {{ quake.magnitude }}</p>
+                    {% if quake.local_time != "Unknown" %}
+                        <p><strong>Local Time:</strong> {{ quake.time_local }}</p>
+                    {% else %}
+                        <p><strong>Time:</strong> Not available</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center">
+                <a href="/all-earthquakes" class="button secondary-btn">View All Earthquakes</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Earthquake Map Section -->
+    <section id="map-section" class="section row big-padding-bottom">
+        <div class="col-12 text-center">
+            <h2>Earthquake Map</h2>
+            <div id="map" class="map-container"></div>
+        </div>
+    </section>
+
+    <!-- Articles Section -->
+    <section id="articles" class="section">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2>Important Articles</h2>
+                <p>Stay informed with the latest research and news about earthquakes in Nepal</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-6">
+                <div class="article-card">
+                    <img src="/static/nep.png" alt="Earthquake Preparedness" class="image-center">
+                    <span class="date">February 20, 2025</span>
+                    <h3>National Earthquake Monitoring and Research Center</h3>
+                    <a href="https://seismonepal.gov.np/content/historical-events" class="read-more">Read More →</a>
+                </div>
+            </div>
+            
+            <div class="col-6">
+                <div class="article-card">
+                    <img src="/static/gobag.jpg" alt="Building Safety" class="image-center">
+                    <span class="date">February 15, 2025</span>
+                    <h3>Nepal earthquake: How a GO BAG (Emergency Kit) became the Bag for Survival</h3>
+                    <a href="https://preparecenter.org/story/nepal-earthquake-how-a-go-bag-emergency-kit-became-the-bag-for-survival/" class="read-more">Read More →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Emergency Contacts Section -->
+    <section id="emergency-contacts" class="section row big-padding-bottom">
+        <div class="col-12 text-center">
+            <h2>Emergency Contacts</h2>
+            <p>Important phone numbers to call during earthquakes and other emergencies in Nepal</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-6">
+                <div class="contact-card">
+                    <h3>Emergency Services</h3>
+                    <table class="emergency-table">
+                        <tr>
+                            <th>Emergency Service</th>
+                            <th>Number</th>
+                            <th>Charge</th>
+                        </tr>
+                        <tr>
+                            <td>Nepal Police</td>
+                            <td>100</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td>Fire Brigade</td>
+                            <td>101</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td>Ambulance</td>
+                            <td>102</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td>Traffic Police</td>
+                            <td>103</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td>Natural Disaster</td>
+                            <td>1149</td>
+                            <td>Free</td>
+                        </tr>
+                        <tr>
+                            <td>Nepal Red Cross Service</td>
+                            <td>1130</td>
+                            <td>Free</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+           
+    </section>
+
+    <!-- Footer Section -->
+    <footer id="landing-footer">
+        <div class="row">
+            <div class="col-12 text-center">
+                <p>&copy; 2025 Earthquake Watch. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <a id="scrollUp" href="#header" aria-label="Scroll to top"></a>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/js/script.js"></script>
+    <div id="earthquakeAlert" class="earthquake-alert">
+        <h3>New Earthquake Detected</h3>
+        <p><strong>Location:</strong> <span id="alertLocation">Dolakha, Nepal</span></p>
+        <p><strong>Magnitude:</strong> <span id="alertMagnitude">4.5</span></p>
+        <p><strong>Time:</strong> <span id="alertTime">February 25, 2025, 10:30 AM</span></p>
+        <div class="alert-buttons">
+            <button class="alert-btn view" id="viewAlertDetails">View Details</button>
+            <button class="alert-btn close" id="closeAlert">Dismiss</button>
+        </div>
+    </div>
+</body>
+</html>

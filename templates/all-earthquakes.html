@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Earthquakes - Earthquake Watch</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Header Section -->
+
+    <!-- All Earthquakes Section -->
+    <section class="all-earthquakes row big-padding-top big-padding-bottom">
+        <div class="col-12 text-center">
+            <h2>All Earthquakes</h2>
+            <div class="earthquake-container clearfix">
+                {% for quake in earthquakes %}
+                <div class="earthquake-card col-3">
+                    <img src="{{ quake.image_url }}" alt="{{ quake.epicenter }}" class="image-center">
+                    <h3>{{ quake.epicenter }}</h3>
+                    <p><strong>Date (B.S.):</strong> {{ quake.date_bs }}</p>
+                    <p><strong>Date (A.D.):</strong> {{ quake.date_ad }}</p>
+                    <p><strong>Magnitude:</strong> {{ quake.magnitude }}</p>
+                    <p><strong>Local Time:</strong> {{ quake.time_local }}</p>
+
+                    <button class="button action-btn" onclick="showMoreInfo('{{ quake.epicenter }}')">More Info</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer id="landing-footer">
+        <div class="row">
+            <div class="col-12 text-center">
+                <p>&copy; 2025 Earthquake Watch. Stay safe, stay prepared!</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <a id="scrollUp" href="#header"></a>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div id="status">
+            <div class="la-ball-triangle-path">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMoreInfo(epicenter) {
+            alert("More info about earthquake at: " + epicenter);
+        }
+    </script>
+</body>
+</html>

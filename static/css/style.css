@@ -1,0 +1,608 @@
+/* Base Styles */
+:root {
+    --primary-color: #e74c3c;
+    --secondary-color: #3498db;
+    --dark-color: #2c3e50;
+    --light-color: #ecf0f1;
+    --danger-color: #c0392b;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --text-color: #333;
+    --border-radius: 4px;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: #f8f9fa;
+  }
+  
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0.8em;
+    line-height: 1.2;
+    color: var(--dark-color);
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+  }
+  
+  p {
+    margin-bottom: 1rem;
+  }
+  
+  a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: var(--transition);
+  }
+  
+  a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+  }
+  
+  /* Grid System */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+  
+  .col-2 {
+    flex: 0 0 16.666667%;
+    max-width: 16.666667%;
+    padding: 0 15px;
+  }
+  
+  .col-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    padding: 0 15px;
+  }
+  
+  .col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 15px;
+  }
+  
+  .col-10 {
+    flex: 0 0 83.333333%;
+    max-width: 83.333333%;
+    padding: 0 15px;
+  }
+  
+  .col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0 15px;
+  }
+  
+  /* Utility Classes */
+  .text-center {
+    text-align: center;
+  }
+  
+  .clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+  .image-center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .big-padding-top {
+    padding-top: 5rem;
+  }
+  
+  .big-padding-bottom {
+    padding-bottom: 5rem;
+  }
+  
+  /* Button Styles */
+  .button {
+    display: inline-block;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    text-decoration: none;
+    margin: 1rem 0;
+  }
+  
+  .primary-btn {
+    color: white;
+    background-color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+  }
+  
+  .primary-btn:hover {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    text-decoration: none;
+    color: white;
+  }
+  
+  .secondary-btn {
+    color: white;
+    background-color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+  }
+  
+  .secondary-btn:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+    text-decoration: none;
+    color: white;
+  }
+  
+  /* Header Styles */
+  #header {
+    background-color: white;
+    padding: 1rem 0;
+    box-shadow: var(--box-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  #logo h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.2rem;
+    color: var(--primary-color);
+  }
+  
+  #logo h2 {
+    font-size: 0.9rem;
+    font-weight: normal;
+    color: var(--dark-color);
+    margin-bottom: 0;
+  }
+  
+  /* Navigation */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+  }
+  
+  #nav-main {
+    list-style: none;
+    display: flex;
+  }
+  
+  #nav-main li {
+    margin-left: 2rem;
+  }
+  
+  #nav-main a {
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  
+  #nav-main a:hover {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/static/earthquake.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    text-align: center;
+    padding: 8rem 0;
+  }
+  
+  .hero p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Section Styles */
+  .section {
+    padding: 3rem 0;
+  }
+  
+  .section h2 {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .section h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--primary-color);
+  }
+  
+  /* Earthquake Cards */
+  .earthquake-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 4rem -15px;
+  }
+  
+  .earthquake-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    transition: var(--transition);
+    width: calc(33.333% - 30px);
+    margin-left: 15px;
+    margin-right: 15px;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .earthquake-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+  }
+  
+  .earthquake-card img {
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    max-height: 200px;
+    width: 100%;
+    object-fit: cover;
+  }
+  
+  .earthquake-card h3 {
+    color: var(--primary-color);
+  }
+  
+  /* Map Container */
+  .map-container {
+    height: 500px;
+    width: 100%;
+    border-radius: var(--border-radius);
+    margin: 2rem 0;
+    box-shadow: var(--box-shadow);
+    border: 1px solid #ddd;
+  }
+  
+  /* Articles Section */
+  #articles {
+    background-color: var(--light-color);
+    padding: 4rem 0;
+  }
+  
+  .article-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    transition: var(--transition);
+    border: 1px solid #ddd;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--secondary-color);
+  }
+  
+  .article-card img {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    margin-bottom: 1rem;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .article-card h3 {
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  .article-card p {
+    flex-grow: 1;
+  }
+  
+  .article-card .date {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .read-more {
+    display: inline-block;
+    margin-top: auto;
+    font-weight: 600;
+    color: var(--secondary-color);
+  }
+  
+  /* Earthquake Alert Popup */
+  .earthquake-alert {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    max-width: 400px;
+    animation: slideIn 0.5s ease forwards;
+    display: none; /* Hidden by default, shown via JS */
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .earthquake-alert h3 {
+    color: white;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .earthquake-alert h3::before {
+    content: "⚠️";
+    margin-right: 0.5rem;
+  }
+  
+  .earthquake-alert p {
+    margin-bottom: 0.5rem;
+  }
+  
+  .earthquake-alert .alert-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  
+  .earthquake-alert .alert-btn {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+  
+  .alert-btn.view {
+    background-color: white;
+    color: var(--primary-color);
+    border: none;
+  }
+  
+  .alert-btn.close {
+    background-color: transparent;
+    color: white;
+    border: 1px solid white;
+  }
+  
+  .alert-btn:hover {
+    opacity: 0.9;
+  }
+  
+  /* Footer Styles */
+  #landing-footer {
+    background-color: var(--dark-color);
+    color: white;
+    padding: 2rem 0;
+  }
+  
+  #landing-footer a {
+    color: var(--light-color);
+  }
+  
+  #landing-footer a:hover {
+    color: var(--primary-color);
+  }
+  
+  /* Scroll to Top Button */
+  #scrollUp {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 50%;
+    box-shadow: var(--box-shadow);
+    z-index: 99;
+    opacity: 0.7;
+    transition: var(--transition);
+  }
+  
+  #scrollUp:hover {
+    opacity: 1;
+    text-decoration: none;
+  }
+  
+  #scrollUp::after {
+    content: "↑";
+    font-size: 20px;
+  }
+  
+  /* Media Queries for Responsiveness */
+  @media (max-width: 992px) {
+    .col-2, .col-10 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    
+    .earthquake-card {
+      width: calc(50% - 30px);
+    }
+    
+    #header .row {
+      flex-direction: column;
+    }
+    
+    #logo {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    
+    nav {
+      justify-content: center;
+    }
+    
+    #nav-main li {
+      margin: 0 1rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2rem;
+    }
+    
+    h2 {
+      font-size: 1.7rem;
+    }
+    
+    .hero p {
+      font-size: 1.2rem;
+    }
+    
+    .map-container {
+      height: 350px;
+    }
+    
+    #nav-main {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    #nav-main li {
+      margin: 0.5rem 0;
+    }
+    
+    .earthquake-card, .article-card {
+      width: 100%;
+      margin-left: 15px;
+      margin-right: 15px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .big-padding-top, .big-padding-bottom {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+    
+    .button {
+      width: 100%;
+    }
+    
+    .earthquake-alert {
+      left: 20px;
+      right: 20px;
+      max-width: none;
+    }
+  }
+
+  /* Table Styles */
+.emergency-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden; /* Ensures rounded corners are visible */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.emergency-table th,
+.emergency-table td {
+    padding: 12px 15px; /* Increased padding for better spacing */
+    text-align: center;
+    border-bottom: 1px solid #ddd; /* Light border for separation */
+}
+
+.emergency-table th {
+    align-self: center;
+    background-color: #007bff; /* Primary color for header */
+    color: #ffffff; /* White text for contrast */
+    font-weight: bold; /* Bold text for headers */
+}
+
+.emergency-table tr:hover {
+    background-color: #f1f1f1; /* Light gray background on hover */
+}
+
+.emergency-table tr:nth-child(even) {
+    background-color: #f9f9f9; /* Zebra striping for even rows */
+}
+
+.emergency-table tr:nth-child(odd) {
+    background-color: #ffffff; /* White background for odd rows */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .emergency-table {
+        font-size: 14px; /* Slightly smaller font on mobile */
+    }
+}
