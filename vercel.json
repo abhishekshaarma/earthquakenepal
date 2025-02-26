@@ -11,5 +11,10 @@
       "src": "/(.*)",
       "dest": "app.py"
     }
-  ]
+  ],
+  "env": {
+    "EARTHQUAKE_URL": "https://seismonepal.gov.np/earthquakes",
+    "UNSPLASH_API_KEY": "@unsplash_api_key",
+    "DATA_DIR": "earthquakes_data"
+  }
 }
