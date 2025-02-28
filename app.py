@@ -50,6 +50,12 @@ def parse_earthquake_data(html):
     rows = tables[0].find_all("tr")
     earthquakes = []
 
+    def safe_float(value, default=0.0):
+        try:
+            return float(value) if value.strip() else default
+        except ValueError:
+            return default
+
     for index, row in enumerate(rows[1:], start=1):  # Skip header
         cells = [cell.get_text(strip=True) for cell in row.find_all("td")]
 
@@ -59,9 +65,9 @@ def parse_earthquake_data(html):
                 ad_date = cells[1].split("A.D.:")[1].strip() if "A.D.:" in cells[1] else "Unknown"
                 local_time = cells[2].split("Local:")[1].split("UTC:")[0].strip() if "Local:" in cells[2] else "Unknown"
                 utc_time = cells[2].split("UTC:")[1].strip() if "UTC:" in cells[2] else "Unknown"
-                latitude = cells[3] if len(cells) > 3 else "Unknown"
-                longitude = cells[4] if len(cells) > 4 else "Unknown"
-                magnitude = cells[5] if len(cells) > 5 else "Unknown"
+                latitude = safe_float(cells[3]) if len(cells) > 3 else 0.0
+                longitude = safe_float(cells[4]) if len(cells) > 4 else 0.0
+                magnitude = safe_float(cells[5]) if len(cells) > 5 else 0.0
                 epicenter = cells[6] if len(cells) > 6 else "Unknown"
 
                 earthquake_info = {
@@ -81,7 +87,7 @@ def parse_earthquake_data(html):
                 logging.error(f"Failed to parse row {index}: {cells} - Error: {e}")
         else:
             logging.warning(f"Row {index} skipped due to insufficient columns: {cells}")
-
+    
     return earthquakes
 
 def get_epicenter_image(epicenter):
