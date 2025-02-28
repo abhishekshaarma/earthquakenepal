@@ -38,6 +38,7 @@ def fetch_earthquake_data():
         logging.error(f"Failed to fetch earthquake data: {e}")
         return None
 
+
 def parse_earthquake_data(html):
     """Parse earthquake data from HTML."""
     soup = BeautifulSoup(html, "html.parser")
@@ -70,6 +71,11 @@ def parse_earthquake_data(html):
                 magnitude = safe_float(cells[5]) if len(cells) > 5 else 0.0
                 epicenter = cells[6] if len(cells) > 6 else "Unknown"
 
+                # Skip entries with invalid or unknown data
+                if ad_date == "Unknown" or magnitude == 0.0 or epicenter == "Unknown":
+                    logging.warning(f"Skipping row {index} due to incomplete data")
+                    continue
+
                 earthquake_info = {
                     "date_bs": bs_date,
                     "date_ad": ad_date,
@@ -88,12 +94,24 @@ def parse_earthquake_data(html):
         else:
             logging.warning(f"Row {index} skipped due to insufficient columns: {cells}")
     
-    return earthquakes
+    # Sort earthquakes by date, most recent first
+    sorted_earthquakes = sort_earthquakes_by_date(earthquakes)
+    return sorted_earthquakes
+
+
+def sort_earthquakes_by_date(earthquakes):
+    """Sort earthquakes by date and time, most recent first."""
+    # Filter out entries with Unknown dates first
+    valid_earthquakes = [quake for quake in earthquakes if quake['date_ad'] != "Unknown" and quake['time_utc'] != "Unknown"]
+    
+    # Then sort the valid entries
+    return sorted(valid_earthquakes, key=lambda x: x['date_ad'] + ' ' + x['time_utc'], reverse=True)
+
 
 def get_epicenter_image(epicenter):
     """Fetch an image URL for the given epicenter using Unsplash API."""
-    if not UNSPLASH_API_KEY:
-        logging.warning("Unsplash API key is missing.")
+    if not UNSPLASH_API_KEY or epicenter == "Unknown":
+        logging.warning(f"Unsplash API key missing or invalid epicenter: {epicenter}")
         return "/static/default.jpg"  # Fallback to a default image
 
     try:
@@ -113,66 +131,98 @@ def get_epicenter_image(epicenter):
         logging.error(f"Failed to fetch image for {epicenter}: {e}")
         return "/static/default.jpg"  # Fallback to a default image
 
+
 def store_earthquake_data(earthquakes):
-    """Store earthquake data as JSON files."""
+    """Store earthquake data as JSON files, avoiding duplicates."""
+    # Skip if no valid earthquakes were found
+    if not earthquakes:
+        logging.warning("No valid earthquakes to store")
+        return
+        
+    # Clear existing files first to avoid duplicates
+    for file in os.listdir(DATA_DIR):
+        if file.endswith('.json'):
+            os.remove(os.path.join(DATA_DIR, file))
+    
+    # Store new data
     for index, quake in enumerate(earthquakes, start=1):
         file_path = os.path.join(DATA_DIR, f"quake_{index}.json")
         with open(file_path, 'w') as f:
             json.dump(quake, f, indent=4)
+
 
 def fetch_and_store_earthquake_data():
     """Fetch, parse, and store earthquake data."""
     html = fetch_earthquake_data()
     if html:
         earthquakes = parse_earthquake_data(html)
-        store_earthquake_data(earthquakes)
-        logging.info(f"Stored {len(earthquakes)} earthquakes.")
+        if earthquakes:  # Only store if we have valid earthquakes
+            store_earthquake_data(earthquakes)
+            logging.info(f"Stored {len(earthquakes)} earthquakes.")
+        else:
+            logging.warning("No valid earthquakes found to store")
+
+
+def get_all_earthquakes():
+    """Read all earthquake data from stored files."""
+    earthquakes = []
+    for filename in os.listdir(DATA_DIR):
+        if filename.endswith(".json"):
+            try:
+                with open(os.path.join(DATA_DIR, filename), 'r') as f:
+                    data = json.load(f)
+                    # Additional validation to filter out incomplete data
+                    if data['date_ad'] != "Unknown" and data['magnitude'] > 0.0:
+                        earthquakes.append(data)
+            except (json.JSONDecodeError, KeyError) as e:
+                logging.error(f"Error reading file {filename}: {e}")
+    
+    # Sort by date just to ensure ordering is consistent
+    return sort_earthquakes_by_date(earthquakes)
+
 
 # Schedule data fetching every 10 minutes
 scheduler = BackgroundScheduler()
 scheduler.add_job(fetch_and_store_earthquake_data, 'interval', minutes=10)
 scheduler.start()
 
+
 @app.route('/')
 def index():
     """Render the homepage with earthquake data."""
-    fetch_and_store_earthquake_data()
-
-    # Read all earthquake files
-    earthquake_cards = []
-    for filename in os.listdir(DATA_DIR):
-        if filename.endswith(".json"):
-            with open(os.path.join(DATA_DIR, filename), 'r') as f:
-                data = json.load(f)
-                earthquake_cards.append(data)
-
-    return render_template('index.html', earthquakes=earthquake_cards)
-
+    # Load already stored data - don't fetch again to avoid duplicates
+    earthquakes = get_all_earthquakes()
+    
+    # Check if data exists, if not, fetch it
+    if not earthquakes:
+        fetch_and_store_earthquake_data()
+        earthquakes = get_all_earthquakes()
+        
+    return render_template('index.html', earthquakes=earthquakes)
 
 
 @app.route('/all-earthquakes')
 def all_earthquakes():
-    # Read all earthquake files
-    earthquake_cards = []
-    for filename in os.listdir(DATA_DIR):
-        if filename.endswith(".json"):
-            with open(os.path.join(DATA_DIR, filename), 'r') as f:
-                data = json.load(f)
-                earthquake_cards.append(data)
-
-    return render_template('all-earthquakes.html', earthquakes=earthquake_cards)
+    """Render page with all earthquake data."""
+    earthquakes = get_all_earthquakes()
+    return render_template('all-earthquakes.html', earthquakes=earthquakes)
 
 
 @app.route('/get-earthquakes')
-def get_earthquakes():
+def get_earthquakes_api():
     """Serve earthquake data as JSON."""
-    earthquakes = []
-    for filename in os.listdir(DATA_DIR):
-        if filename.endswith(".json"):
-            with open(os.path.join(DATA_DIR, filename), 'r') as f:
-                data = json.load(f)
-                earthquakes.append(data)
+    earthquakes = get_all_earthquakes()
     return jsonify(earthquakes)
 
+
+@app.route('/refresh')
+def refresh_data():
+    """Manual endpoint to refresh earthquake data."""
+    fetch_and_store_earthquake_data()
+    return jsonify({"status": "success", "message": "Data refreshed successfully"})
+
+
 if __name__ == '__main__':
+    # Fetch data on startup
+    fetch_and_store_earthquake_data()
     app.run(debug=True)
