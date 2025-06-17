@@ -53,15 +53,37 @@ def fetch_earthquake_data():
             try:
                 cells = row.find_all('td')
                 if len(cells) >= 8:
+                    # Parse date and time
+                    date_text = cells[0].text.strip()
+                    time_text = cells[2].text.strip()
+                    
+                    # Extract BS and AD dates
+                    bs_date = date_text.split("B.S.:")[1].split("A.D.:")[0].strip() if "B.S.:" in date_text else "Unknown"
+                    ad_date = date_text.split("A.D.:")[1].strip() if "A.D.:" in date_text else "Unknown"
+                    
+                    # Extract local and UTC times
+                    local_time = time_text.split("Local:")[1].split("UTC:")[0].strip() if "Local:" in time_text else "Unknown"
+                    utc_time = time_text.split("UTC:")[1].strip() if "UTC:" in time_text else "Unknown"
+                    
+                    # Parse magnitude
+                    try:
+                        magnitude = float(cells[2].text.strip())
+                    except ValueError:
+                        magnitude = 0.0
+                    
                     earthquake = {
-                        'date': cells[0].text.strip(),
+                        'date_bs': bs_date,
+                        'date_ad': ad_date,
+                        'time_local': local_time,
+                        'time_utc': utc_time,
+                        'magnitude': magnitude,
                         'epicenter': cells[1].text.strip(),
-                        'magnitude': cells[2].text.strip(),
-                        'latitude': cells[3].text.strip(),
-                        'longitude': cells[4].text.strip(),
+                        'latitude': float(cells[3].text.strip()) if cells[3].text.strip() else 0.0,
+                        'longitude': float(cells[4].text.strip()) if cells[4].text.strip() else 0.0,
                         'depth': cells[5].text.strip(),
                         'remarks': cells[6].text.strip(),
-                        'source': cells[7].text.strip()
+                        'source': cells[7].text.strip(),
+                        'image_url': '/static/nep.png'  # Default image
                     }
                     earthquakes.append(earthquake)
             except Exception as e:
@@ -69,7 +91,7 @@ def fetch_earthquake_data():
                 continue
                 
         logging.info(f"Successfully fetched {len(earthquakes)} earthquakes")
-        return earthquakes
+        return sorted(earthquakes, key=lambda x: x['date_ad'] + ' ' + x['time_utc'], reverse=True)
         
     except Exception as e:
         logging.error(f"Error fetching earthquake data: {e}")
