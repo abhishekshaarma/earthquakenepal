@@ -20,7 +20,6 @@
         "FLASK_ENV": "production",
         "FLASK_APP": "app.py",
         "PYTHONUNBUFFERED": "1",
-        "DATA_DIR": "/tmp/earthquakes_data",
         "EARTHQUAKE_URL": "https://seismonepal.gov.np/earthquakes"
     }
 }
