@@ -2,11 +2,11 @@ import os
 import json
 import logging
 import requests
+import time
 from flask import Flask, render_template, jsonify
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
-import time
 
 # Load environment variables
 load_dotenv()
@@ -25,26 +25,85 @@ EARTHQUAKE_URL = os.getenv("EARTHQUAKE_URL", "https://seismonepal.gov.np/earthqu
 UNSPLASH_API_KEY = os.getenv("UNSPLASH_API_KEY")
 UNSPLASH_API_URL = "https://api.unsplash.com/search/photos"
 
-# Initialize scheduler only if not in Vercel environment
-if not os.getenv('VERCEL'):
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(fetch_and_store_earthquake_data, 'interval', minutes=10)
-    scheduler.start()
+# Cache for earthquake data with timestamp
+earthquake_cache = {
+    'data': None,
+    'timestamp': None,
+    'last_epicenter': None
+}
 
-# Cache for earthquake data
-earthquake_cache = None
-last_fetch_time = None
-
-def get_cached_earthquakes():
-    global earthquake_cache, last_fetch_time
+def should_update_cache():
+    """Check if cache should be updated based on time and data freshness."""
+    if not earthquake_cache['timestamp']:
+        return True
+    
     current_time = time.time()
+    cache_age = current_time - earthquake_cache['timestamp']
     
-    # If cache is empty or older than 10 minutes, refresh it
-    if earthquake_cache is None or (last_fetch_time and current_time - last_fetch_time > 600):
-        earthquake_cache = get_all_earthquakes()
-        last_fetch_time = current_time
+    # Update if cache is older than 5 minutes
+    return cache_age > 300
+
+def fetch_latest_earthquake():
+    """Fetch the latest earthquake data from the source."""
+    try:
+        response = requests.get(EARTHQUAKE_URL, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        })
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        table = soup.find('table')
+        
+        if not table:
+            return None
+            
+        rows = table.find_all('tr')[1:]  # Skip header row
+        if not rows:
+            return None
+            
+        # Get the first row (most recent earthquake)
+        cells = rows[0].find_all('td')
+        if len(cells) >= 8:
+            epicenter = cells[1].text.strip()
+            return epicenter
+            
+    except Exception as e:
+        logging.error(f"Error fetching latest earthquake: {e}")
     
-    return earthquake_cache
+    return None
+
+def update_cache():
+    """Update the earthquake data cache."""
+    global earthquake_cache
+    
+    try:
+        # Check if we need to update
+        if not should_update_cache():
+            return earthquake_cache['data']
+        
+        # Fetch latest earthquake to check for updates
+        latest_epicenter = fetch_latest_earthquake()
+        
+        # If we have cached data and the latest earthquake hasn't changed, don't update
+        if (earthquake_cache['data'] and 
+            earthquake_cache['last_epicenter'] and 
+            latest_epicenter == earthquake_cache['last_epicenter']):
+            return earthquake_cache['data']
+        
+        # Fetch and store new data
+        fetch_and_store_earthquake_data()
+        earthquakes = get_all_earthquakes()
+        
+        # Update cache
+        earthquake_cache['data'] = earthquakes
+        earthquake_cache['timestamp'] = time.time()
+        earthquake_cache['last_epicenter'] = latest_epicenter
+        
+        return earthquakes
+    except Exception as e:
+        logging.error(f"Error updating cache: {e}")
+        # Return cached data if available, otherwise empty list
+        return earthquake_cache['data'] or []
 
 def fetch_earthquake_data():
     """Fetch earthquake data from the specified URL."""
@@ -205,39 +264,61 @@ def get_all_earthquakes():
 @app.route('/')
 def index():
     """Render the homepage with earthquake data."""
-    earthquakes = get_cached_earthquakes()
-    return render_template('index.html', earthquakes=earthquakes)
+    try:
+        earthquakes = update_cache()
+        return render_template('index.html', earthquakes=earthquakes)
+    except Exception as e:
+        logging.error(f"Error in index route: {e}")
+        return render_template('index.html', earthquakes=[])
 
 
 @app.route('/all-earthquakes')
 def all_earthquakes():
     """Render the all earthquakes page."""
-    earthquakes = get_cached_earthquakes()
-    return render_template('all-earthquakes.html', earthquakes=earthquakes)
+    try:
+        earthquakes = update_cache()
+        return render_template('all-earthquakes.html', earthquakes=earthquakes)
+    except Exception as e:
+        logging.error(f"Error in all_earthquakes route: {e}")
+        return render_template('all-earthquakes.html', earthquakes=[])
 
 
 @app.route('/get-earthquakes')
 def get_earthquakes():
     """API endpoint to get earthquake data."""
-    earthquakes = get_cached_earthquakes()
-    return jsonify(earthquakes)
+    try:
+        earthquakes = update_cache()
+        return jsonify(earthquakes)
+    except Exception as e:
+        logging.error(f"Error in get_earthquakes route: {e}")
+        return jsonify([])
 
 
 @app.route('/refresh')
 def refresh_data():
     """Manual endpoint to refresh earthquake data."""
-    global earthquake_cache, last_fetch_time
-    fetch_and_store_earthquake_data()
-    earthquake_cache = get_all_earthquakes()
-    last_fetch_time = time.time()
-    return jsonify({"status": "success", "message": "Data refreshed successfully"})
+    try:
+        global earthquake_cache
+        fetch_and_store_earthquake_data()
+        earthquakes = get_all_earthquakes()
+        
+        # Update cache
+        earthquake_cache['data'] = earthquakes
+        earthquake_cache['timestamp'] = time.time()
+        earthquake_cache['last_epicenter'] = fetch_latest_earthquake()
+        
+        return jsonify({"status": "success", "message": "Data refreshed successfully"})
+    except Exception as e:
+        logging.error(f"Error in refresh_data route: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
-# For Vercel deployment
+# Initialize data on startup
+try:
+    update_cache()
+except Exception as e:
+    logging.error(f"Error during initial data fetch: {e}")
+
+# For local development
 if __name__ == '__main__':
-    # Initial data fetch
-    fetch_and_store_earthquake_data()
     app.run(debug=True)
-else:
-    # For Vercel serverless environment
-    fetch_and_store_earthquake_data()
