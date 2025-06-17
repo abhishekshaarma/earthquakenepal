@@ -47,22 +47,62 @@
             <h2>Recent Earthquakes in Nepal</h2>
             <div class="earthquake-container clearfix">
                 {% for quake in earthquakes[:4] %}
-                <div class="earthquake-card col-4">
+                <div class="earthquake-card">
+                    <div class="severity-indicator {% if quake.magnitude < 4.5 %}low{% elif quake.magnitude < 6.0 %}medium{% else %}high{% endif %}"></div>
                     <img src="{{ quake.image_url }}" alt="Epicenter: {{ quake.epicenter }}" class="image-center">
+                    <div class="magnitude {% if quake.magnitude < 4.5 %}low{% elif quake.magnitude < 6.0 %}medium{% else %}high{% endif %}">
+                        M{{ quake.magnitude }}
+                    </div>
                     <h3>{{ quake.epicenter }}</h3>
-                    <p><strong>Date (B.S.):</strong> {{ quake.date_bs }}</p>
-                    <p><strong>Date (A.D.):</strong> {{ quake.date_ad }}</p>
-                    <p><strong>Magnitude:</strong> {{ quake.magnitude }}</p>
-                    {% if quake.local_time != "Unknown" %}
-                        <p><strong>Local Time:</strong> {{ quake.time_local }}</p>
-                    {% else %}
-                        <p><strong>Time:</strong> Not available</p>
-                    {% endif %}
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Date (B.S.)</span>
+                            <span class="info-value">{{ quake.date_bs }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Date (A.D.)</span>
+                            <span class="info-value">{{ quake.date_ad }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Local Time</span>
+                            <span class="info-value">{{ quake.time_local }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">UTC Time</span>
+                            <span class="info-value">{{ quake.time_utc }}</span>
+                        </div>
+                    </div>
+                    <a href="/earthquake-details?id={{ loop.index }}" class="action-btn">View Details</a>
                 </div>
                 {% endfor %}
             </div>
             <div class="text-center">
                 <a href="/all-earthquakes" class="button secondary-btn">View All Earthquakes</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Visualization Section -->
+    <section id="visualization" class="section row big-padding-bottom">
+        <div class="col-12 text-center">
+            <h2>Earthquake Analytics</h2>
+            <div class="visualization-container">
+                <div class="chart-row">
+                    <div class="chart-card">
+                        <h3>Magnitude Distribution</h3>
+                        <canvas id="magnitudeChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Monthly Frequency</h3>
+                        <canvas id="frequencyChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-card full-width">
+                        <h3>Regional Distribution</h3>
+                        <canvas id="regionalChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -173,7 +213,9 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/js/script.js"></script>
+    <script src="/static/js/visualization.js"></script>
     <div id="earthquakeAlert" class="earthquake-alert">
         <h3>New Earthquake Detected</h3>
         <p><strong>Location:</strong> <span id="alertLocation">Dolakha, Nepal</span></p>

@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-06-02",
-    "date_ad": "2024-09-18",
-    "time_local": "10:08",
-    "time_utc": "04:23",
-    "latitude": 29.43,
-    "longitude": 81.07,
-    "magnitude": 4.3,
-    "epicenter": "Bajhang",
-    "image_url": "/static/default.jpg"
+    "date_bs": "2081-09-16",
+    "date_ad": "2024-12-31",
+    "time_local": "07:54",
+    "time_utc": "02:09",
+    "latitude": 29.45,
+    "longitude": 80.86,
+    "magnitude": 4.6,
+    "epicenter": "Baitadi",
+    "image_url": "https://images.unsplash.com/photo-1608566175163-9f6249e9124d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxCYWl0YWRpfGVufDB8fHx8MTc1MDE5NTA4MHww&ixlib=rb-4.1.0&q=80&w=400"
 }

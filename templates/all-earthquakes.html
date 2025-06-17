@@ -15,15 +15,32 @@
             <h2>All Earthquakes</h2>
             <div class="earthquake-container clearfix">
                 {% for quake in earthquakes %}
-                <div class="earthquake-card col-3">
-                    <img src="{{ quake.image_url }}" alt="{{ quake.epicenter }}" class="image-center">
+                <div class="earthquake-card">
+                    <div class="severity-indicator {% if quake.magnitude < 4.5 %}low{% elif quake.magnitude < 6.0 %}medium{% else %}high{% endif %}"></div>
+                    <img src="{{ quake.image_url }}" alt="Epicenter: {{ quake.epicenter }}" class="image-center">
+                    <div class="magnitude {% if quake.magnitude < 4.5 %}low{% elif quake.magnitude < 6.0 %}medium{% else %}high{% endif %}">
+                        M{{ quake.magnitude }}
+                    </div>
                     <h3>{{ quake.epicenter }}</h3>
-                    <p><strong>Date (B.S.):</strong> {{ quake.date_bs }}</p>
-                    <p><strong>Date (A.D.):</strong> {{ quake.date_ad }}</p>
-                    <p><strong>Magnitude:</strong> {{ quake.magnitude }}</p>
-                    <p><strong>Local Time:</strong> {{ quake.time_local }}</p>
-
-                    <button class="button action-btn" onclick="showMoreInfo('{{ quake.epicenter }}')">More Info</button>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Date (B.S.)</span>
+                            <span class="info-value">{{ quake.date_bs }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Date (A.D.)</span>
+                            <span class="info-value">{{ quake.date_ad }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Local Time</span>
+                            <span class="info-value">{{ quake.time_local }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">UTC Time</span>
+                            <span class="info-value">{{ quake.time_utc }}</span>
+                        </div>
+                    </div>
+                    <a href="/earthquake-details?id={{ loop.index }}" class="action-btn">View Details</a>
                 </div>
                 {% endfor %}
             </div>

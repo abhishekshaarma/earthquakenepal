@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-09-11",
-    "date_ad": "2024-12-26",
-    "time_local": "06:33",
-    "time_utc": "00:48",
-    "latitude": 29.07,
-    "longitude": 82.32,
-    "magnitude": 4.2,
-    "epicenter": "Jajarkot",
-    "image_url": "/static/default.jpg"
+    "date_bs": "2081-11-24",
+    "date_ad": "2025-03-08",
+    "time_local": "14:35",
+    "time_utc": "08:50",
+    "latitude": 28.42,
+    "longitude": 87.63,
+    "magnitude": 5.9,
+    "epicenter": "Dinggye, China",
+    "image_url": "https://images.unsplash.com/photo-1589799600591-9edc8b2c1516?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxEaW5nZ3llJTJDJTIwQ2hpbmF8ZW58MHx8fHwxNzUwMTk1MDc1fDA&ixlib=rb-4.1.0&q=80&w=400"
 }

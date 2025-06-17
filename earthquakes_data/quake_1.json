@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-10-30",
-    "date_ad": "2025-02-12",
-    "time_local": "15:38",
-    "time_utc": "09:53",
-    "latitude": 29.35,
-    "longitude": 82.18,
-    "magnitude": 4.1,
-    "epicenter": "Jumla*",
-    "image_url": "https://images.unsplash.com/photo-1543860244-4edc340d09fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxKdW1sYSp8ZW58MHx8fHwxNzQwNTE2NDU5fDA&ixlib=rb-4.0.3&q=80&w=400"
+    "date_bs": "2081-12-21",
+    "date_ad": "2025-04-04",
+    "time_local": "20:10",
+    "time_utc": "14:25",
+    "latitude": 28.96,
+    "longitude": 82.12,
+    "magnitude": 5.5,
+    "epicenter": "Jajarkot*",
+    "image_url": "https://images.unsplash.com/photo-1653549549472-45bd72dcf13b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxKYWphcmtvdCp8ZW58MHx8fHwxNzUwMTk1MDcxfDA&ixlib=rb-4.1.0&q=80&w=400"
 }

@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-09-02",
-    "date_ad": "2024-12-17",
-    "time_local": "17:08",
-    "time_utc": "11:23",
-    "latitude": 29.71,
-    "longitude": 81.3,
-    "magnitude": 4.3,
-    "epicenter": "Bajhang",
-    "image_url": "/static/default.jpg"
+    "date_bs": "2081-10-22",
+    "date_ad": "2025-02-04",
+    "time_local": "17:20",
+    "time_utc": "11:35",
+    "latitude": 28.98,
+    "longitude": 81.5,
+    "magnitude": 4.4,
+    "epicenter": "Dailekh",
+    "image_url": "https://images.unsplash.com/photo-1543411173-82669c51bbed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxEYWlsZWtofGVufDB8fHx8MTc1MDE5NTA3OHww&ixlib=rb-4.1.0&q=80&w=400"
 }

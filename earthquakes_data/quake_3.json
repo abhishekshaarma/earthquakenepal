@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-09-23",
-    "date_ad": "2025-01-07",
-    "time_local": "06:50",
-    "time_utc": "01:05",
-    "latitude": 28.31,
-    "longitude": 87.37,
-    "magnitude": 7.0,
-    "epicenter": "Dinggye, China",
-    "image_url": "https://images.unsplash.com/photo-1510001618818-4b4e3d86bf0f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxEaW5nZ3llJTJDJTIwQ2hpbmF8ZW58MHx8fHwxNzQwNTE2NDYwfDA&ixlib=rb-4.0.3&q=80&w=400"
+    "date_bs": "2081-12-20",
+    "date_ad": "2025-04-03",
+    "time_local": "17:04",
+    "time_utc": "11:19",
+    "latitude": 30.02,
+    "longitude": 80.84,
+    "magnitude": 4.0,
+    "epicenter": "Darchula",
+    "image_url": "https://images.unsplash.com/photo-1694712282542-1c9929653496?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxEYXJjaHVsYXxlbnwwfHx8fDE3NTAxOTUwNzJ8MA&ixlib=rb-4.1.0&q=80&w=400"
 }

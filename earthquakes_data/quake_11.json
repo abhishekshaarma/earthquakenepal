@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-09-04",
-    "date_ad": "2024-12-19",
-    "time_local": "07:37",
-    "time_utc": "01:52",
-    "latitude": 28.55,
-    "longitude": 84.15,
-    "magnitude": 4.7,
-    "epicenter": "Neshyang, Manang",
-    "image_url": "https://images.unsplash.com/photo-1562081049-1311c761ccd7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxOZXNoeWFuZyUyQyUyME1hbmFuZ3xlbnwwfHx8fDE3NDA1MTY0NjR8MA&ixlib=rb-4.0.3&q=80&w=400"
+    "date_bs": "2081-11-15",
+    "date_ad": "2025-02-27",
+    "time_local": "02:51",
+    "time_utc": "21:06",
+    "latitude": 27.98,
+    "longitude": 85.88,
+    "magnitude": 6.1,
+    "epicenter": "Sindhupalchowk",
+    "image_url": "https://images.unsplash.com/photo-1701240068416-2c276d1531f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxTaW5kaHVwYWxjaG93a3xlbnwwfHx8fDE3NTAxOTUwNzd8MA&ixlib=rb-4.1.0&q=80&w=400"
 }

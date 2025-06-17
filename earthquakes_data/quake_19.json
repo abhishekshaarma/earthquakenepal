@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-05-13",
-    "date_ad": "2024-08-29",
-    "time_local": "19:34",
-    "time_utc": "13:49",
-    "latitude": 29.54,
-    "longitude": 81.3,
-    "magnitude": 4.3,
-    "epicenter": "Bajhang",
-    "image_url": "/static/default.jpg"
+    "date_bs": "2081-09-11",
+    "date_ad": "2024-12-26",
+    "time_local": "06:33",
+    "time_utc": "00:48",
+    "latitude": 29.07,
+    "longitude": 82.32,
+    "magnitude": 4.2,
+    "epicenter": "Jajarkot",
+    "image_url": "https://images.unsplash.com/photo-1617136041743-451cb49648b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxKYWphcmtvdHxlbnwwfHx8fDE3NTAxOTUwNzJ8MA&ixlib=rb-4.1.0&q=80&w=400"
 }

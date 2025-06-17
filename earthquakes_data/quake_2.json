@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-10-22",
-    "date_ad": "2025-02-04",
-    "time_local": "17:20",
-    "time_utc": "11:35",
-    "latitude": 28.98,
-    "longitude": 81.5,
-    "magnitude": 4.4,
-    "epicenter": "Dailekh",
-    "image_url": "https://images.unsplash.com/photo-1543411173-82669c51bbed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxEYWlsZWtofGVufDB8fHx8MTc0MDUxNjQ1OXww&ixlib=rb-4.0.3&q=80&w=400"
+    "date_bs": "2081-12-21",
+    "date_ad": "2025-04-04",
+    "time_local": "20:07",
+    "time_utc": "14:22",
+    "latitude": 28.95,
+    "longitude": 82.12,
+    "magnitude": 5.2,
+    "epicenter": "Jajarkot",
+    "image_url": "https://images.unsplash.com/photo-1617136041743-451cb49648b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxKYWphcmtvdHxlbnwwfHx8fDE3NTAxOTUwNzJ8MA&ixlib=rb-4.1.0&q=80&w=400"
 }

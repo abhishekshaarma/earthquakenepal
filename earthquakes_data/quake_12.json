@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-09-03",
-    "date_ad": "2024-12-18",
-    "time_local": "15:02",
-    "time_utc": "09:17",
-    "latitude": 29.7,
-    "longitude": 81.3,
+    "date_bs": "2081-10-30",
+    "date_ad": "2025-02-12",
+    "time_local": "15:38",
+    "time_utc": "09:53",
+    "latitude": 29.35,
+    "longitude": 82.18,
     "magnitude": 4.1,
-    "epicenter": "Bajhang",
-    "image_url": "/static/default.jpg"
+    "epicenter": "Jumla",
+    "image_url": "https://images.unsplash.com/photo-1511019557345-928db7a25fce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxKdW1sYXxlbnwwfHx8fDE3NTAxOTUwNzd8MA&ixlib=rb-4.1.0&q=80&w=400"
 }

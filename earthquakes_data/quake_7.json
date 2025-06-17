@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-09-16",
-    "date_ad": "2024-12-31",
-    "time_local": "07:54",
-    "time_utc": "02:09",
-    "latitude": 29.45,
-    "longitude": 80.86,
-    "magnitude": 4.6,
-    "epicenter": "Baitadi",
-    "image_url": "https://images.unsplash.com/photo-1608566175163-9f6249e9124d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxCYWl0YWRpfGVufDB8fHx8MTc0MDUxNjQ2Mnww&ixlib=rb-4.0.3&q=80&w=400"
+    "date_bs": "2081-11-26",
+    "date_ad": "2025-03-10",
+    "time_local": "04:11",
+    "time_utc": "22:26",
+    "latitude": 28.28,
+    "longitude": 84.13,
+    "magnitude": 4.3,
+    "epicenter": "Kaski",
+    "image_url": "https://images.unsplash.com/photo-1706094322398-a46cf0c3dfeb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxLYXNraXxlbnwwfHx8fDE3NTAxOTUwNzV8MA&ixlib=rb-4.1.0&q=80&w=400"
 }

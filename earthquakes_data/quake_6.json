@@ -1,11 +1,11 @@
 {
-    "date_bs": "2081-09-18",
-    "date_ad": "2025-01-02",
-    "time_local": "13:02",
-    "time_utc": "07:17",
-    "latitude": 27.77,
-    "longitude": 85.57,
-    "magnitude": 4.8,
-    "epicenter": "Sindhupalchok",
-    "image_url": "https://images.unsplash.com/photo-1601231519048-a3a92894d166?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxTaW5kaHVwYWxjaG9rfGVufDB8fHx8MTc0MDUxNjQ2MXww&ixlib=rb-4.0.3&q=80&w=400"
+    "date_bs": "2081-12-04",
+    "date_ad": "2025-03-18",
+    "time_local": "06:33",
+    "time_utc": "00:48",
+    "latitude": 29.19,
+    "longitude": 81.44,
+    "magnitude": 4.3,
+    "epicenter": "Achham",
+    "image_url": "https://images.unsplash.com/photo-1603712074168-eb245ae56e67?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MTEwODh8MHwxfHNlYXJjaHwxfHxBY2hoYW18ZW58MHx8fHwxNzUwMTk1MDc0fDA&ixlib=rb-4.1.0&q=80&w=400"
 }

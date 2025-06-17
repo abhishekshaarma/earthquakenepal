@@ -6,6 +6,7 @@ from flask import Flask, render_template, jsonify
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
+import time
 
 # Load environment variables
 load_dotenv()
@@ -21,9 +22,29 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 # URLs and API keys
 EARTHQUAKE_URL = os.getenv("EARTHQUAKE_URL", "https://seismonepal.gov.np/earthquakes")
-UNSPLASH_API_KEY = os.getenv("UNSPLASH_API_KEY")  # Add your Unsplash API key to .env
+UNSPLASH_API_KEY = os.getenv("UNSPLASH_API_KEY")
 UNSPLASH_API_URL = "https://api.unsplash.com/search/photos"
 
+# Initialize scheduler only if not in Vercel environment
+if not os.getenv('VERCEL'):
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(fetch_and_store_earthquake_data, 'interval', minutes=10)
+    scheduler.start()
+
+# Cache for earthquake data
+earthquake_cache = None
+last_fetch_time = None
+
+def get_cached_earthquakes():
+    global earthquake_cache, last_fetch_time
+    current_time = time.time()
+    
+    # If cache is empty or older than 10 minutes, refresh it
+    if earthquake_cache is None or (last_fetch_time and current_time - last_fetch_time > 600):
+        earthquake_cache = get_all_earthquakes()
+        last_fetch_time = current_time
+    
+    return earthquake_cache
 
 def fetch_earthquake_data():
     """Fetch earthquake data from the specified URL."""
@@ -181,48 +202,42 @@ def get_all_earthquakes():
     return sort_earthquakes_by_date(earthquakes)
 
 
-# Schedule data fetching every 10 minutes
-scheduler = BackgroundScheduler()
-scheduler.add_job(fetch_and_store_earthquake_data, 'interval', minutes=10)
-scheduler.start()
-
-
 @app.route('/')
 def index():
     """Render the homepage with earthquake data."""
-    # Load already stored data - don't fetch again to avoid duplicates
-    earthquakes = get_all_earthquakes()
-    
-    # Check if data exists, if not, fetch it
-    if not earthquakes:
-        fetch_and_store_earthquake_data()
-        earthquakes = get_all_earthquakes()
-        
+    earthquakes = get_cached_earthquakes()
     return render_template('index.html', earthquakes=earthquakes)
 
 
 @app.route('/all-earthquakes')
 def all_earthquakes():
-    """Render page with all earthquake data."""
-    earthquakes = get_all_earthquakes()
+    """Render the all earthquakes page."""
+    earthquakes = get_cached_earthquakes()
     return render_template('all-earthquakes.html', earthquakes=earthquakes)
 
 
 @app.route('/get-earthquakes')
-def get_earthquakes_api():
-    """Serve earthquake data as JSON."""
-    earthquakes = get_all_earthquakes()
+def get_earthquakes():
+    """API endpoint to get earthquake data."""
+    earthquakes = get_cached_earthquakes()
     return jsonify(earthquakes)
 
 
 @app.route('/refresh')
 def refresh_data():
     """Manual endpoint to refresh earthquake data."""
+    global earthquake_cache, last_fetch_time
     fetch_and_store_earthquake_data()
+    earthquake_cache = get_all_earthquakes()
+    last_fetch_time = time.time()
     return jsonify({"status": "success", "message": "Data refreshed successfully"})
 
 
+# For Vercel deployment
 if __name__ == '__main__':
-    # Fetch data on startup
+    # Initial data fetch
     fetch_and_store_earthquake_data()
     app.run(debug=True)
+else:
+    # For Vercel serverless environment
+    fetch_and_store_earthquake_data()
