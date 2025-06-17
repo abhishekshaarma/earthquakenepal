@@ -8,11 +8,18 @@ from bs4 import BeautifulSoup
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 
+# Configure logging with more detailed format
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('app.log')
+    ]
+)
+
 # Load environment variables
 load_dotenv()
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 
@@ -35,13 +42,16 @@ earthquake_cache = {
 def should_update_cache():
     """Check if cache should be updated based on time and data freshness."""
     if not earthquake_cache['timestamp']:
+        logging.info("Cache is empty, should update")
         return True
     
     current_time = time.time()
     cache_age = current_time - earthquake_cache['timestamp']
     
     # Update if cache is older than 5 minutes
-    return cache_age > 300
+    should_update = cache_age > 300
+    logging.info(f"Cache age: {cache_age:.2f}s, should update: {should_update}")
+    return should_update
 
 def fetch_latest_earthquake():
     """Fetch the latest earthquake data from the source."""
@@ -79,6 +89,7 @@ def update_cache():
     try:
         # Check if we need to update
         if not should_update_cache():
+            logging.info("Using cached data")
             return earthquake_cache['data']
         
         # Fetch latest earthquake to check for updates
@@ -99,6 +110,7 @@ def update_cache():
         earthquake_cache['timestamp'] = time.time()
         earthquake_cache['last_epicenter'] = latest_epicenter
         
+        logging.info(f"Cache updated with {len(earthquakes)} earthquakes")
         return earthquakes
     except Exception as e:
         logging.error(f"Error updating cache: {e}")
@@ -106,18 +118,52 @@ def update_cache():
         return earthquake_cache['data'] or []
 
 def fetch_earthquake_data():
-    """Fetch earthquake data from the specified URL."""
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
+    """Fetch earthquake data from the source."""
     try:
-        response = requests.get(EARTHQUAKE_URL, headers=headers)
-        response.raise_for_status()  # Raise an error for bad status codes
-        return response.text
-    except requests.RequestException as e:
-        logging.error(f"Failed to fetch earthquake data: {e}")
-        return None
-
+        logging.info(f"Fetching earthquake data from {EARTHQUAKE_URL}")
+        response = requests.get(EARTHQUAKE_URL, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        })
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        table = soup.find('table')
+        
+        if not table:
+            logging.error("No table found in the response")
+            return []
+            
+        rows = table.find_all('tr')[1:]  # Skip header row
+        if not rows:
+            logging.error("No earthquake data rows found")
+            return []
+            
+        earthquakes = []
+        for row in rows:
+            try:
+                cells = row.find_all('td')
+                if len(cells) >= 8:
+                    earthquake = {
+                        'date': cells[0].text.strip(),
+                        'epicenter': cells[1].text.strip(),
+                        'magnitude': cells[2].text.strip(),
+                        'latitude': cells[3].text.strip(),
+                        'longitude': cells[4].text.strip(),
+                        'depth': cells[5].text.strip(),
+                        'remarks': cells[6].text.strip(),
+                        'source': cells[7].text.strip()
+                    }
+                    earthquakes.append(earthquake)
+            except Exception as e:
+                logging.error(f"Error parsing earthquake row: {e}")
+                continue
+                
+        logging.info(f"Successfully fetched {len(earthquakes)} earthquakes")
+        return earthquakes
+        
+    except Exception as e:
+        logging.error(f"Error fetching earthquake data: {e}")
+        return []
 
 def parse_earthquake_data(html):
     """Parse earthquake data from HTML."""
@@ -178,7 +224,6 @@ def parse_earthquake_data(html):
     sorted_earthquakes = sort_earthquakes_by_date(earthquakes)
     return sorted_earthquakes
 
-
 def sort_earthquakes_by_date(earthquakes):
     """Sort earthquakes by date and time, most recent first."""
     # Filter out entries with Unknown dates first
@@ -186,7 +231,6 @@ def sort_earthquakes_by_date(earthquakes):
     
     # Then sort the valid entries
     return sorted(valid_earthquakes, key=lambda x: x['date_ad'] + ' ' + x['time_utc'], reverse=True)
-
 
 def get_epicenter_image(epicenter):
     """Fetch an image URL for the given epicenter using Unsplash API."""
@@ -211,7 +255,6 @@ def get_epicenter_image(epicenter):
         logging.error(f"Failed to fetch image for {epicenter}: {e}")
         return "/static/default.jpg"  # Fallback to a default image
 
-
 def store_earthquake_data(earthquakes):
     """Store earthquake data as JSON files, avoiding duplicates."""
     # Skip if no valid earthquakes were found
@@ -230,91 +273,107 @@ def store_earthquake_data(earthquakes):
         with open(file_path, 'w') as f:
             json.dump(quake, f, indent=4)
 
-
 def fetch_and_store_earthquake_data():
-    """Fetch, parse, and store earthquake data."""
-    html = fetch_earthquake_data()
-    if html:
-        earthquakes = parse_earthquake_data(html)
-        if earthquakes:  # Only store if we have valid earthquakes
-            store_earthquake_data(earthquakes)
-            logging.info(f"Stored {len(earthquakes)} earthquakes.")
-        else:
-            logging.warning("No valid earthquakes found to store")
-
+    """Fetch and store earthquake data."""
+    try:
+        earthquakes = fetch_earthquake_data()
+        if not earthquakes:
+            logging.error("No earthquakes fetched")
+            return
+            
+        # Store each earthquake in a separate file
+        for i, quake in enumerate(earthquakes):
+            try:
+                filename = os.path.join(DATA_DIR, f'quake_{i+1}.json')
+                with open(filename, 'w', encoding='utf-8') as f:
+                    json.dump(quake, f, ensure_ascii=False, indent=2)
+                logging.info(f"Stored earthquake {i+1} in {filename}")
+            except Exception as e:
+                logging.error(f"Error storing earthquake {i+1}: {e}")
+                
+    except Exception as e:
+        logging.error(f"Error in fetch_and_store_earthquake_data: {e}")
 
 def get_all_earthquakes():
-    """Read all earthquake data from stored files."""
-    earthquakes = []
-    for filename in os.listdir(DATA_DIR):
-        if filename.endswith(".json"):
-            try:
-                with open(os.path.join(DATA_DIR, filename), 'r') as f:
-                    data = json.load(f)
-                    # Additional validation to filter out incomplete data
-                    if data['date_ad'] != "Unknown" and data['magnitude'] > 0.0:
-                        earthquakes.append(data)
-            except (json.JSONDecodeError, KeyError) as e:
-                logging.error(f"Error reading file {filename}: {e}")
-    
-    # Sort by date just to ensure ordering is consistent
-    return sort_earthquakes_by_date(earthquakes)
-
+    """Get all stored earthquake data."""
+    try:
+        earthquakes = []
+        for filename in os.listdir(DATA_DIR):
+            if filename.endswith('.json'):
+                try:
+                    with open(os.path.join(DATA_DIR, filename), 'r', encoding='utf-8') as f:
+                        earthquake = json.load(f)
+                        earthquakes.append(earthquake)
+                except Exception as e:
+                    logging.error(f"Error reading {filename}: {e}")
+                    continue
+                    
+        logging.info(f"Retrieved {len(earthquakes)} earthquakes from storage")
+        return sorted(earthquakes, key=lambda x: x['date'], reverse=True)
+    except Exception as e:
+        logging.error(f"Error in get_all_earthquakes: {e}")
+        return []
 
 @app.route('/')
 def index():
     """Render the homepage with earthquake data."""
     try:
         earthquakes = update_cache()
+        logging.info(f"Rendering index with {len(earthquakes)} earthquakes")
         return render_template('index.html', earthquakes=earthquakes)
     except Exception as e:
         logging.error(f"Error in index route: {e}")
         return render_template('index.html', earthquakes=[])
-
 
 @app.route('/all-earthquakes')
 def all_earthquakes():
     """Render the all earthquakes page."""
     try:
         earthquakes = update_cache()
+        logging.info(f"Rendering all-earthquakes with {len(earthquakes)} earthquakes")
         return render_template('all-earthquakes.html', earthquakes=earthquakes)
     except Exception as e:
         logging.error(f"Error in all_earthquakes route: {e}")
         return render_template('all-earthquakes.html', earthquakes=[])
-
 
 @app.route('/get-earthquakes')
 def get_earthquakes():
     """API endpoint to get earthquake data."""
     try:
         earthquakes = update_cache()
+        logging.info(f"API returning {len(earthquakes)} earthquakes")
         return jsonify(earthquakes)
     except Exception as e:
         logging.error(f"Error in get_earthquakes route: {e}")
         return jsonify([])
-
 
 @app.route('/refresh')
 def refresh_data():
     """Manual endpoint to refresh earthquake data."""
     try:
         global earthquake_cache
+        logging.info("Manual refresh requested")
         fetch_and_store_earthquake_data()
         earthquakes = get_all_earthquakes()
+        
+        if not earthquakes:
+            logging.error("No earthquakes retrieved after manual refresh")
+            return jsonify({"status": "error", "message": "No earthquakes retrieved"}), 500
         
         # Update cache
         earthquake_cache['data'] = earthquakes
         earthquake_cache['timestamp'] = time.time()
-        earthquake_cache['last_epicenter'] = fetch_latest_earthquake()
+        earthquake_cache['last_epicenter'] = earthquakes[0]['epicenter'] if earthquakes else None
         
+        logging.info(f"Manual refresh completed with {len(earthquakes)} earthquakes")
         return jsonify({"status": "success", "message": "Data refreshed successfully"})
     except Exception as e:
         logging.error(f"Error in refresh_data route: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
 # Initialize data on startup
 try:
+    logging.info("Initializing application")
     update_cache()
 except Exception as e:
     logging.error(f"Error during initial data fetch: {e}")
