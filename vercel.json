@@ -11,11 +11,5 @@
             "src": "/(.*)",
             "dest": "app.py"
         }
-    ],
-    "env": {
-        "FLASK_ENV": "production",
-        "FLASK_APP": "app.py",
-        "PYTHONUNBUFFERED": "1",
-        "EARTHQUAKE_URL": "https://seismonepal.gov.np/earthquakes"
-    }
+    ]
 }
