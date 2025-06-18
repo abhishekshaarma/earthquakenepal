@@ -33,7 +33,7 @@ def fetch_earthquake_data():
     }
     try:
         response = requests.get(EARTHQUAKE_URL, headers=headers)
-        response.raise_for_status()  # Raise an error for bad status codes
+        response.raise_for_status()
         return response.text
     except requests.RequestException as e:
         logging.error(f"Failed to fetch earthquake data: {e}")
@@ -42,6 +42,9 @@ def fetch_earthquake_data():
 
 def parse_earthquake_data(html):
     """Parse earthquake data from HTML."""
+    if not html:
+        return []
+        
     soup = BeautifulSoup(html, 'html.parser')
     table = soup.find('table')
     if not table:
@@ -173,29 +176,49 @@ scheduler.start()
 @app.route('/')
 def index():
     """Render the main page."""
-    earthquakes = get_all_earthquakes()
-    return render_template('index.html', earthquakes=earthquakes)
+    try:
+        html = fetch_earthquake_data()
+        earthquakes = parse_earthquake_data(html)
+        return render_template('index.html', earthquakes=earthquakes)
+    except Exception as e:
+        logging.error(f"Error in index route: {e}")
+        return render_template('index.html', earthquakes=[])
 
 
 @app.route('/all-earthquakes')
 def all_earthquakes():
     """Render the all earthquakes page."""
-    earthquakes = get_all_earthquakes()
-    return render_template('all-earthquakes.html', earthquakes=earthquakes)
+    try:
+        html = fetch_earthquake_data()
+        earthquakes = parse_earthquake_data(html)
+        return render_template('all-earthquakes.html', earthquakes=earthquakes)
+    except Exception as e:
+        logging.error(f"Error in all_earthquakes route: {e}")
+        return render_template('all-earthquakes.html', earthquakes=[])
 
 
 @app.route('/get-earthquakes')
 def get_earthquakes_api():
     """Serve earthquake data as JSON."""
-    earthquakes = get_all_earthquakes()
-    return jsonify(earthquakes)
+    try:
+        html = fetch_earthquake_data()
+        earthquakes = parse_earthquake_data(html)
+        return jsonify(earthquakes)
+    except Exception as e:
+        logging.error(f"Error in get_earthquakes_api route: {e}")
+        return jsonify([])
 
 
 @app.route('/refresh')
 def refresh_data():
     """Manually trigger data refresh."""
-    fetch_and_store_earthquake_data()
-    return jsonify({"status": "success", "message": "Data refreshed successfully"})
+    try:
+        html = fetch_earthquake_data()
+        earthquakes = parse_earthquake_data(html)
+        return jsonify({"status": "success", "message": "Data refreshed successfully", "count": len(earthquakes)})
+    except Exception as e:
+        logging.error(f"Error in refresh_data route: {e}")
+        return jsonify({"status": "error", "message": str(e)})
 
 
 if __name__ == '__main__':
