@@ -21,7 +21,7 @@ DATA_DIR = os.getenv("DATA_DIR", "earthquakes_data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
 # URLs and API keys
-EARTHQUAKE_URL = os.getenv("EARTHQUAKE_URL", "https://seismonepal.gov.np/earthquakes")
+EARTHQUAKE_URL = "https://seismonepal.gov.np/earthquakes"
 UNSPLASH_API_KEY = os.getenv("UNSPLASH_API_KEY")  # Add your Unsplash API key to .env
 UNSPLASH_API_URL = "https://api.unsplash.com/search/photos"
 
@@ -32,8 +32,10 @@ def fetch_earthquake_data():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
     try:
-        response = requests.get(EARTHQUAKE_URL, headers=headers)
+        logging.info(f"Fetching data from {EARTHQUAKE_URL}")
+        response = requests.get(EARTHQUAKE_URL, headers=headers, timeout=10)
         response.raise_for_status()
+        logging.info("Successfully fetched earthquake data")
         return response.text
     except requests.RequestException as e:
         logging.error(f"Failed to fetch earthquake data: {e}")
@@ -43,69 +45,76 @@ def fetch_earthquake_data():
 def parse_earthquake_data(html):
     """Parse earthquake data from HTML."""
     if not html:
+        logging.error("No HTML content to parse")
         return []
         
-    soup = BeautifulSoup(html, 'html.parser')
-    table = soup.find('table')
-    if not table:
+    try:
+        soup = BeautifulSoup(html, 'html.parser')
+        table = soup.find('table')
+        if not table:
+            logging.error("No table found in HTML")
+            return []
+
+        earthquakes = []
+        rows = table.find_all('tr')[1:]  # Skip header row
+
+        for row in rows:
+            cells = row.find_all('td')
+            if len(cells) >= 8:  # Ensure we have enough cells
+                try:
+                    # Parse date (format: "B.S.: YYYY-MM-DD A.D.: YYYY-MM-DD")
+                    date_text = cells[0].text.strip()
+                    date_parts = date_text.split('A.D.:')
+                    date_bs = date_parts[0].replace('B.S.:', '').strip()
+                    date_ad = date_parts[1].strip() if len(date_parts) > 1 else "Unknown"
+
+                    # Parse time (format: "Local: HH:MM UTC: HH:MM")
+                    time_text = cells[1].text.strip()
+                    time_parts = time_text.split('UTC:')
+                    time_local = time_parts[0].replace('Local:', '').strip()
+                    time_utc = time_parts[1].strip() if len(time_parts) > 1 else "Unknown"
+
+                    # Parse coordinates
+                    latitude = float(cells[2].text.strip())
+                    longitude = float(cells[3].text.strip())
+
+                    # Parse magnitude (remove 'M' prefix if present)
+                    magnitude_text = cells[4].text.strip()
+                    magnitude = float(magnitude_text.replace('M', ''))
+
+                    # Parse epicenter
+                    epicenter = cells[5].text.strip()
+                    # Remove BS/AD date if present in epicenter
+                    if 'B.S.' in epicenter or 'A.D.' in epicenter:
+                        epicenter = "Nepal"
+
+                    # Get source
+                    source = cells[7].text.strip() if len(cells) > 7 else "Nepal Seismological Center"
+
+                    earthquake = {
+                        'date_bs': date_bs,
+                        'date_ad': date_ad,
+                        'time_local': time_local,
+                        'time_utc': time_utc,
+                        'latitude': latitude,
+                        'longitude': longitude,
+                        'magnitude': magnitude,
+                        'epicenter': epicenter,
+                        'source': source,
+                        'image_url': '/static/earthquake.jpg'  # Default image
+                    }
+                    earthquakes.append(earthquake)
+                except Exception as e:
+                    logging.error(f"Error parsing row: {e}")
+                    continue
+
+        # Sort by UTC time
+        earthquakes.sort(key=lambda x: x['time_utc'], reverse=True)
+        logging.info(f"Successfully parsed {len(earthquakes)} earthquakes")
+        return earthquakes
+    except Exception as e:
+        logging.error(f"Error parsing earthquake data: {e}")
         return []
-
-    earthquakes = []
-    rows = table.find_all('tr')[1:]  # Skip header row
-
-    for row in rows:
-        cells = row.find_all('td')
-        if len(cells) >= 8:  # Ensure we have enough cells
-            try:
-                # Parse date (format: "B.S.: YYYY-MM-DD A.D.: YYYY-MM-DD")
-                date_text = cells[0].text.strip()
-                date_parts = date_text.split('A.D.:')
-                date_bs = date_parts[0].replace('B.S.:', '').strip()
-                date_ad = date_parts[1].strip() if len(date_parts) > 1 else "Unknown"
-
-                # Parse time (format: "Local: HH:MM UTC: HH:MM")
-                time_text = cells[1].text.strip()
-                time_parts = time_text.split('UTC:')
-                time_local = time_parts[0].replace('Local:', '').strip()
-                time_utc = time_parts[1].strip() if len(time_parts) > 1 else "Unknown"
-
-                # Parse coordinates
-                latitude = float(cells[2].text.strip())
-                longitude = float(cells[3].text.strip())
-
-                # Parse magnitude (remove 'M' prefix if present)
-                magnitude_text = cells[4].text.strip()
-                magnitude = float(magnitude_text.replace('M', ''))
-
-                # Parse epicenter
-                epicenter = cells[5].text.strip()
-                # Remove BS/AD date if present in epicenter
-                if 'B.S.' in epicenter or 'A.D.' in epicenter:
-                    epicenter = "Nepal"
-
-                # Get source
-                source = cells[7].text.strip() if len(cells) > 7 else "Nepal Seismological Center"
-
-                earthquake = {
-                    'date_bs': date_bs,
-                    'date_ad': date_ad,
-                    'time_local': time_local,
-                    'time_utc': time_utc,
-                    'latitude': latitude,
-                    'longitude': longitude,
-                    'magnitude': magnitude,
-                    'epicenter': epicenter,
-                    'source': source,
-                    'image_url': '/static/earthquake.jpg'  # Default image
-                }
-                earthquakes.append(earthquake)
-            except Exception as e:
-                logging.error(f"Error parsing row: {e}")
-                continue
-
-    # Sort by UTC time
-    earthquakes.sort(key=lambda x: x['time_utc'], reverse=True)
-    return earthquakes
 
 
 def get_epicenter_image(epicenter):
@@ -179,6 +188,7 @@ def index():
     try:
         html = fetch_earthquake_data()
         earthquakes = parse_earthquake_data(html)
+        logging.info(f"Rendering index page with {len(earthquakes)} earthquakes")
         return render_template('index.html', earthquakes=earthquakes)
     except Exception as e:
         logging.error(f"Error in index route: {e}")
@@ -191,6 +201,7 @@ def all_earthquakes():
     try:
         html = fetch_earthquake_data()
         earthquakes = parse_earthquake_data(html)
+        logging.info(f"Rendering all-earthquakes page with {len(earthquakes)} earthquakes")
         return render_template('all-earthquakes.html', earthquakes=earthquakes)
     except Exception as e:
         logging.error(f"Error in all_earthquakes route: {e}")
@@ -203,6 +214,7 @@ def get_earthquakes_api():
     try:
         html = fetch_earthquake_data()
         earthquakes = parse_earthquake_data(html)
+        logging.info(f"Serving {len(earthquakes)} earthquakes via API")
         return jsonify(earthquakes)
     except Exception as e:
         logging.error(f"Error in get_earthquakes_api route: {e}")
