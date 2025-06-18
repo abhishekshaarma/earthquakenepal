@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earthquake Watch</title>
+    <title>Nepal Earthquake Monitor</title>
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 </head>
 <body>
 
@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-2">
                 <div id="logo">
-                    <h1>🌎 Earthquake Watch</h1>
+                    <h1>🌍Nepal Earthquake Monitor</h1>
                     <h2>Your Safety, Our Priority</h2>
                 </div>
             </div>
@@ -27,7 +27,6 @@
                 <ul id="nav-main">
                     <li><a href="#monitoring">Monitoring</a></li>
                     <li><a href="/all-earthquakes">All Earthquakes</a></li>
-                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
         </div>
@@ -45,31 +44,73 @@
     <section id="monitoring" class="section row big-padding-bottom">
         <div class="col-12 text-center">
             <h2>Recent Earthquakes in Nepal</h2>
-            <div class="earthquake-container clearfix">
+            <div class="earthquake-cards">
                 {% for quake in earthquakes[:4] %}
                 <div class="earthquake-card">
-                    <div class="severity-indicator {% if quake.magnitude < 4.5 %}low{% elif quake.magnitude < 6.0 %}medium{% else %}high{% endif %}"></div>
-                    <img src="{{ quake.image_url }}" alt="Epicenter: {{ quake.epicenter }}" class="image-center">
-                    <div class="magnitude {% if quake.magnitude < 4.5 %}low{% elif quake.magnitude < 6.0 %}medium{% else %}high{% endif %}">
-                        M{{ quake.magnitude }}
+                    {% set magnitude_class = 'magnitude-7-plus' %}
+                    {% if quake.magnitude < 3 %}
+                        {% set magnitude_class = 'magnitude-0-3' %}
+                    {% elif quake.magnitude < 4 %}
+                        {% set magnitude_class = 'magnitude-3-4' %}
+                    {% elif quake.magnitude < 5 %}
+                        {% set magnitude_class = 'magnitude-4-5' %}
+                    {% elif quake.magnitude < 6 %}
+                        {% set magnitude_class = 'magnitude-5-6' %}
+                    {% elif quake.magnitude < 7 %}
+                        {% set magnitude_class = 'magnitude-6-7' %}
+                    {% endif %}
+                    
+                    <img src="{{ quake.image_url }}" alt="Epicenter: {{ quake.epicenter }}" class="card-image">
+                    <div class="magnitude-indicator {{ magnitude_class }}">
+                        {{ "%.1f"|format(quake.magnitude) }}
                     </div>
-                    <h3>{{ quake.epicenter }}</h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Date (B.S.)</span>
-                            <span class="info-value">{{ quake.date_bs }}</span>
+                    
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3 class="epicenter">{{ quake.epicenter }}</h3>
+                            <div class="date-time">
+                                <span><i class="fas fa-calendar"></i> {{ quake.date_ad }}</span>
+                                <span><i class="fas fa-clock"></i> {{ quake.time_local }} (Local)</span>
+                                <span><i class="fas fa-globe"></i> {{ quake.time_utc }} (UTC)</span>
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">Date (A.D.)</span>
-                            <span class="info-value">{{ quake.date_ad }}</span>
+                        
+                        <div class="location-details">
+                            <div class="location-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Latitude: {{ "%.4f"|format(quake.latitude) }}°</span>
+                            </div>
+                            <div class="location-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Longitude: {{ "%.4f"|format(quake.longitude) }}°</span>
+                            </div>
+                            <div class="location-detail">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>BS Date: {{ quake.date_bs }}</span>
+                            </div>
+                            <div class="location-detail">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Source: {{ quake.source }}</span>
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">Local Time</span>
-                            <span class="info-value">{{ quake.time_local }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">UTC Time</span>
-                            <span class="info-value">{{ quake.time_utc }}</span>
+                        
+                        <div class="severity-indicator severity-{{ magnitude_class|replace('magnitude-', '') }}">
+                            <div class="severity-dot"></div>
+                            <span>
+                                {% if quake.magnitude < 3 %}
+                                    Minor Earthquake
+                                {% elif quake.magnitude < 4 %}
+                                    Light Earthquake
+                                {% elif quake.magnitude < 5 %}
+                                    Moderate Earthquake
+                                {% elif quake.magnitude < 6 %}
+                                    Strong Earthquake
+                                {% elif quake.magnitude < 7 %}
+                                    Major Earthquake
+                                {% else %}
+                                    Great Earthquake
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
                     <a href="/earthquake-details?id={{ loop.index }}" class="action-btn">View Details</a>
@@ -203,19 +244,39 @@
     <footer id="landing-footer">
         <div class="row">
             <div class="col-12 text-center">
-                <p>&copy; 2025 Earthquake Watch. All rights reserved.</p>
+                <p>&copy; 2025 Nepal Earthquake Monitor. Made with 4love in Kathmandu</p>
             </div>
         </div>
     </footer>
 
     <!-- Scroll to Top Button -->
-    <a id="scrollUp" href="#header" aria-label="Scroll to top"></a>
+    <button id="scrollUp" onclick="scrollToTop()" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/js/script.js"></script>
     <script src="/static/js/visualization.js"></script>
+    <script>
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Show/hide scroll button based on scroll position
+        window.onscroll = function() {
+            const scrollButton = document.getElementById('scrollUp');
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollButton.style.display = "block";
+            } else {
+                scrollButton.style.display = "none";
+            }
+        };
+    </script>
     <div id="earthquakeAlert" class="earthquake-alert">
         <h3>New Earthquake Detected</h3>
         <p><strong>Location:</strong> <span id="alertLocation">Dolakha, Nepal</span></p>

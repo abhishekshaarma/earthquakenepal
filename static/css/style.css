@@ -263,138 +263,238 @@
     background-color: var(--primary-color);
   }
   
-  /* Earthquake Cards */
-  .earthquake-container {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 4rem -15px;
+  /* Earthquake Cards Container */
+  .earthquake-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+    padding: 1rem;
   }
   
+  /* Earthquake Cards */
   .earthquake-card {
-    background-color: white;
+    background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-    width: calc(33.333% - 30px);
-    margin: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
     border: 1px solid #e0e0e0;
     display: flex;
     flex-direction: column;
-    position: relative;
-    overflow: hidden;
   }
   
   .earthquake-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   }
   
-  .earthquake-card img {
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
+  /* Card Image */
+  .card-image {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    border-radius: 12px 12px 0 0;
   }
   
-  .earthquake-card:hover img {
-    transform: scale(1.05);
-  }
-  
-  .earthquake-card h3 {
-    color: var(--primary-color);
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-  }
-  
-  .earthquake-card .magnitude {
+  /* Magnitude Indicator */
+  .magnitude-indicator {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 1.2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    top: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    z-index: 2;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
-  .earthquake-card .magnitude.low {
-    color: #2ecc71;
+  .magnitude-indicator::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: inherit;
+    filter: blur(4px);
+    opacity: 0.5;
+    z-index: -1;
   }
   
-  .earthquake-card .magnitude.medium {
-    color: #f1c40f;
+  /* Magnitude Colors */
+  .magnitude-0-3 {
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
   }
   
-  .earthquake-card .magnitude.high {
-    color: #e74c3c;
+  .magnitude-3-4 {
+    background: linear-gradient(135deg, #FFC107, #FFA000);
   }
   
-  .earthquake-card .info-grid {
+  .magnitude-4-5 {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+  }
+  
+  .magnitude-5-6 {
+    background: linear-gradient(135deg, #FF5722, #E64A19);
+  }
+  
+  .magnitude-6-7 {
+    background: linear-gradient(135deg, #F44336, #D32F2F);
+  }
+  
+  .magnitude-7-plus {
+    background: linear-gradient(135deg, #D32F2F, #B71C1C);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  }
+  
+  .earthquake-card:hover .magnitude-indicator {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Card Content */
+  .card-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+  
+  .epicenter {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  .date-time {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .date-time span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .date-time i {
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  /* Location Details */
+  .location-details {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
   }
   
-  .earthquake-card .info-item {
+  .location-detail {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
   }
   
-  .earthquake-card .info-label {
-    font-size: 0.9rem;
+  .location-detail i {
     color: #666;
-    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
   }
   
-  .earthquake-card .info-value {
+  .location-detail span {
+    font-size: 0.9rem;
+    color: #444;
+  }
+  
+  /* Severity Indicator */
+  .severity-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
     font-weight: 500;
-    color: #333;
   }
   
-  .earthquake-card .severity-indicator {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
+  .severity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
   }
   
-  .earthquake-card .severity-indicator.low {
-    background-color: #2ecc71;
+  /* Severity Colors */
+  .severity-0-3 { color: #4CAF50; }
+  .severity-3-4 { color: #FFC107; }
+  .severity-4-5 { color: #FF9800; }
+  .severity-5-6 { color: #FF5722; }
+  .severity-6-7 { color: #F44336; }
+  .severity-7-plus { color: #D32F2F; }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .earthquake-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
   
-  .earthquake-card .severity-indicator.medium {
-    background-color: #f1c40f;
+  @media (max-width: 768px) {
+    .earthquake-cards {
+      grid-template-columns: 1fr;
+    }
+    
+    .location-details {
+      grid-template-columns: 1fr;
+    }
   }
   
-  .earthquake-card .severity-indicator.high {
-    background-color: #e74c3c;
+  /* Animation */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
   }
   
-  .earthquake-card .action-btn {
-    margin-top: 1.5rem;
-    padding: 0.75rem 1.5rem;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-align: center;
-    text-decoration: none;
-  }
-  
-  .earthquake-card .action-btn:hover {
-    background-color: var(--secondary-color);
+  .earthquake-card:hover .magnitude-indicator {
+    animation: pulse 1s infinite;
   }
   
   /* Map Container */
@@ -553,29 +653,30 @@
   /* Scroll to Top Button */
   #scrollUp {
     position: fixed;
-    right: 20px;
-    bottom: 20px;
-    background-color: var(--primary-color);
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: #D32F2F;
     color: white;
-    width: 40px;
-    height: 40px;
-    text-align: center;
-    line-height: 40px;
+    border: none;
     border-radius: 50%;
-    box-shadow: var(--box-shadow);
-    z-index: 99;
-    opacity: 0.7;
-    transition: var(--transition);
+    cursor: pointer;
+    display: none;
+    font-size: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
   }
   
   #scrollUp:hover {
-    opacity: 1;
-    text-decoration: none;
+    background: #B71C1C;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   }
   
-  #scrollUp::after {
-    content: "↑";
-    font-size: 20px;
+  #scrollUp:active {
+    transform: translateY(0);
   }
   
   /* Media Queries for Responsiveness */
@@ -604,41 +705,6 @@
     
     #nav-main li {
       margin: 0 1rem;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    h1 {
-      font-size: 2rem;
-    }
-    
-    h2 {
-      font-size: 1.7rem;
-    }
-    
-    .hero p {
-      font-size: 1.2rem;
-    }
-    
-    .map-container {
-      height: 350px;
-    }
-    
-    #nav-main {
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    #nav-main li {
-      margin: 0.5rem 0;
-    }
-    
-    .earthquake-card {
-      width: 100%;
-    }
-    
-    .earthquake-card .info-grid {
-      grid-template-columns: 1fr;
     }
   }
   
