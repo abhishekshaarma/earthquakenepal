@@ -53,23 +53,38 @@ def fetch_earthquake_data():
             try:
                 cells = row.find_all('td')
                 if len(cells) >= 8:
-                    # Parse date and time
+                    # Get raw text
                     date_text = cells[0].text.strip()
-                    time_text = cells[2].text.strip()
+                    epicenter_text = cells[1].text.strip()
+                    magnitude_text = cells[2].text.strip()
+                    time_text = cells[3].text.strip()
                     
-                    # Extract BS and AD dates
-                    bs_date = date_text.split("B.S.:")[1].split("A.D.:")[0].strip() if "B.S.:" in date_text else "Unknown"
-                    ad_date = date_text.split("A.D.:")[1].strip() if "A.D.:" in date_text else "Unknown"
+                    # Parse date
+                    bs_date = "Unknown"
+                    ad_date = "Unknown"
+                    if "B.S.:" in date_text and "A.D.:" in date_text:
+                        parts = date_text.split("A.D.:")
+                        bs_date = parts[0].replace("B.S.:", "").strip()
+                        ad_date = parts[1].strip()
                     
-                    # Extract local and UTC times
-                    local_time = time_text.split("Local:")[1].split("UTC:")[0].strip() if "Local:" in time_text else "Unknown"
-                    utc_time = time_text.split("UTC:")[1].strip() if "UTC:" in time_text else "Unknown"
+                    # Parse time
+                    local_time = "Unknown"
+                    utc_time = "Unknown"
+                    if "Local:" in time_text and "UTC:" in time_text:
+                        parts = time_text.split("UTC:")
+                        local_time = parts[0].replace("Local:", "").strip()
+                        utc_time = parts[1].strip()
                     
                     # Parse magnitude
                     try:
-                        magnitude = float(cells[2].text.strip())
+                        magnitude = float(magnitude_text.replace('M', ''))
                     except ValueError:
                         magnitude = 0.0
+                    
+                    # Parse epicenter
+                    epicenter = epicenter_text
+                    if "B.S.:" in epicenter and "A.D.:" in epicenter:
+                        epicenter = epicenter.split("A.D.:")[1].strip()
                     
                     earthquake = {
                         'date_bs': bs_date,
@@ -77,12 +92,12 @@ def fetch_earthquake_data():
                         'time_local': local_time,
                         'time_utc': utc_time,
                         'magnitude': magnitude,
-                        'epicenter': cells[1].text.strip(),
-                        'latitude': float(cells[3].text.strip()) if cells[3].text.strip() else 0.0,
-                        'longitude': float(cells[4].text.strip()) if cells[4].text.strip() else 0.0,
-                        'depth': cells[5].text.strip(),
-                        'remarks': cells[6].text.strip(),
-                        'source': cells[7].text.strip(),
+                        'epicenter': epicenter,
+                        'latitude': float(cells[4].text.strip()) if cells[4].text.strip() else 0.0,
+                        'longitude': float(cells[5].text.strip()) if cells[5].text.strip() else 0.0,
+                        'depth': cells[6].text.strip(),
+                        'remarks': cells[7].text.strip(),
+                        'source': cells[8].text.strip() if len(cells) > 8 else "Unknown",
                         'image_url': '/static/nep.png'  # Default image
                     }
                     earthquakes.append(earthquake)
